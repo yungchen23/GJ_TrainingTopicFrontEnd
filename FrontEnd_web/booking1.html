@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GJ小吃攤</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        /* 左右區塊排版 */
+        .container {
+            display: flex;
+            margin-top: 50px;
+        }
+
+        /* 左側選單 */
+        .sidebar {
+            width: 25%;
+            padding-right: 20px;
+            border-right: 1px solid #ccc;
+        }
+
+        .sidebar ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .sidebar ul li {
+            margin: 10px 0;
+        }
+
+        .sidebar ul li a {
+            text-decoration: none;
+            font-size: 18px;
+            color: black;
+            display: block;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+
+        .sidebar ul li a:hover {
+            background-color: #e9ecef;
+        }
+
+        /* 右側預約訂單清單 */
+        .content {
+            width: 75%;
+            padding-left: 20px;
+        }
+
+        .content h4 {
+            text-align: left;
+            font-weight: bold;
+        }
+
+        .order-list {
+            margin-top: 20px;
+        }
+
+        .order-table {
+            width: 100%;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #f8f9fa;
+        }
+
+        .order-table th,
+        .order-table td {
+            padding: 10px;
+            text-align: left;
+        }
+
+        .order-table th {
+            width: 15%;
+        }
+
+        .order-actions {
+            text-align: right;
+        }
+
+        .order-actions button {
+            margin-left: 10px;
+        }
+
+        .order-data {
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+
+        .order-time {
+            color: chocolate;
+            font-size: 2.0em;
+            font-weight: bold;
+        }
+
+        .order-people,
+        .order-id,
+        .order-tel,
+        .order-address,
+        .order-require {
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+
+        /* 選單樣式 */
+        .order-filter {
+            margin-bottom: 20px;
+        }
+
+        .order-filter {
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: flex-start;
+        }
+
+        /* 編輯按鈕靠右 */
+        .edit-btn {
+            display: block;
+            margin-left: auto;
+            margin-bottom: 20px;
+        }
+
+        /* 時段的字體放大 */
+        .form-check-label {
+            font-size: 1.25rem;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- 引入導航欄 -->
+    <div id="navbar"></div>
+
+    <!-- 左右區塊 -->
+    <div class="container">
+        <!-- 左側選單 -->
+        <div class="sidebar">
+            <ul>
+                <li><a href="information.html">店家資訊</a></li>
+                <li><a href="restaurantmenu.html">店家菜單</a></li>
+                <li><a href="booking1.html">我要預約</a></li>
+            </ul>
+        </div>
+
+        <!-- 右側預約訂單清單 -->
+        <div class="content">
+            <div class="text-left">
+                <h4>選擇人數與日期</h4>
+            </div>
+
+            <div class="order-list">
+                <!-- 用餐人數 -->
+                <table class="table order-table">
+                    <thead>
+                        <th>用餐人數</th>
+                    </thead>
+                    <tr>
+                        <td class="order-tel">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <label for="adult-select" class="form-label">大人</label>
+                                    <select class="form-select" id="adult-select">
+                                        <option value="0" selected>0</option>
+                                        <option value="1">1</option>
+                                        <option value="2">2</option>
+                                        <option value="3">3</option>
+                                        <option value="4">4</option>
+                                        <option value="5">5</option>
+                                        <option value="6">6</option>
+                                        <option value="7">7</option>
+                                        <option value="8">8</option>
+                                        <option value="9">9</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="child-select" class="form-label">小孩</label>
+                                    <select class="form-select" id="child-select">
+                                        <option value="0" selected>0</option>
+                                        <option value="1">1</option>
+                                        <option value="2">2</option>
+                                        <option value="3">3</option>
+                                        <option value="4">4</option>
+                                        <option value="5">5</option>
+                                        <option value="6">6</option>
+                                        <option value="7">7</option>
+                                        <option value="8">8</option>
+                                        <option value="9">9</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+
+                <!-- 選擇日期 -->
+                <table class="table order-table">
+                    <thead>
+                        <th><label for="date-select" class="form-label">選擇日期</label></th>
+                    </thead>
+                    <tr>
+                        <td class="order-data">
+                            <div class="row">
+                                <select class="form-select" id="date-select"></select>
+
+                                <!-- <div class="col-md-4">
+                                    <label for="year-select" class="form-label">年</label>
+                                    <select class="form-select" id="year-select">
+                                        <option value="2024" selected>2024</option>
+                                        <option value="2025">2025</option>
+                                        <option value="2026">2026</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="month-select" class="form-label">月</label>
+                                    <select class="form-select" id="month-select">
+                                        <option value="1">1</option>
+                                        <option value="2">2</option>
+                                        <option value="3">3</option>
+                                        <option value="4">4</option>
+                                        <option value="5">5</option>
+                                        <option value="6">6</option>
+                                        <option value="7">7</option>
+                                        <option value="8">8</option>
+                                        <option value="9">9</option>
+                                        <option value="10">10</option>
+                                        <option value="11">11</option>
+                                        <option value="12">12</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="day-select" class="form-label">日</label>
+                                    <select class="form-select" id="day-select">
+                                        <option value="1">1</option>
+                                        <option value="2">2</option>
+                                        <option value="3">3</option>
+                                        <option value="4">4</option>
+                                        <option value="5">5</option>
+                                        <option value="6">6</option>
+                                        <option value="7">7</option>
+                                        <option value="8">8</option>
+                                        <option value="9">9</option>
+                                        <option value="10">10</option>
+                                        <option value="11">11</option>
+                                        <option value="12">12</option>
+                                        <option value="13">13</option>
+                                        <option value="14">14</option>
+                                        <option value="15">15</option>
+                                        <option value="16">16</option>
+                                        <option value="17">17</option>
+                                        <option value="18">18</option>
+                                        <option value="19">19</option>
+                                        <option value="20">20</option>
+                                        <option value="21">21</option>
+                                        <option value="22">22</option>
+                                        <option value="23">23</option>
+                                        <option value="24">24</option>
+                                        <option value="25">25</option>
+                                        <option value="26">26</option>
+                                        <option value="27">27</option>
+                                        <option value="28">28</option>
+                                        <option value="29">29</option>
+                                        <option value="30">30</option>
+                                        <option value="31">31</option>
+                                    </select>
+                                </div> -->
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+
+                <!-- 選擇時段 -->
+                <table class="table order-table">
+                    <thead>
+                        <th>選擇時段</th>
+                    </thead>
+                    <tr>
+                        <td class="order-time">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h6>午餐時段</h6>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="time-slot" id="slot1"
+                                            value="11:00">
+                                        <label class="form-check-label" for="slot1">11:00</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="time-slot" id="slot2"
+                                            value="11:15">
+                                        <label class="form-check-label" for="slot2">11:15</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="time-slot" id="slot3"
+                                            value="11:30">
+                                        <label class="form-check-label" for="slot3">11:30</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="time-slot" id="slot4"
+                                            value="11:45">
+                                        <label class="form-check-label" for="slot4">11:45</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="time-slot" id="slot5"
+                                            value="12:00">
+                                        <label class="form-check-label" for="slot5">12:00</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <h6>晚餐時段</h6>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="time-slot" id="slot6"
+                                            value="18:00">
+                                        <label class="form-check-label" for="slot6">18:00</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="time-slot" id="slot7"
+                                            value="18:15">
+                                        <label class="form-check-label" for="slot7">18:15</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="time-slot" id="slot8"
+                                            value="18:30">
+                                        <label class="form-check-label" for="slot8">18:30</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="time-slot" id="slot9"
+                                            value="18:45">
+                                        <label class="form-check-label" for="slot9">18:45</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="time-slot" id="slot10"
+                                            value="19:00">
+                                        <label class="form-check-label" for="slot10">19:00</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+
+                <!-- 訂位需求 -->
+                <table class="table order-table">
+                    <thead>
+                        <th><label for="order-requirement" class="form-label">訂位需求(※選填)</label></th>
+                    </thead>
+                    <tr>
+                        <td class="order-require"><textarea class="form-control" id="order-requirement"
+                                rows="3"></textarea></td>
+                    </tr>
+                </table>
+
+                <div class="d-flex justify-content-end mt-4">
+                    <button type="button" class="btn btn-primary me-3" id="submit-booking">我要預約</button>
+                    <button type="button" class="btn btn-secondary"
+                        onclick="window.location.href='index2.html'">取消返回</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 空白區塊 -->
+    <div class="spacer"></div>
+
+    <!-- 引入頁腳 -->
+    <div id="footer"></div>
+
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- jQuery 加載導航欄和頁腳 -->
+    <script>
+        $(function () {
+            $("#navbar").load("nav.html");
+            $("#footer").load("footer.html");
+        });
+    </script>
+
+    <script>
+        $(document).ready(function () {
+
+            // 清除之前的預約數據，開始新流程
+            localStorage.removeItem('bookingData');
+            localStorage.removeItem('finalBookingData');
+            localStorage.removeItem('bookingId');
+
+
+            // 檢查是否登入，若無 sessionId 則跳轉至登入頁
+            const sessionId = sessionStorage.getItem('sessionId');
+            if (!sessionId) {
+                window.location.href = 'login.html';
+
+            } else {
+                // 通過 Ajax 請求確認 session 是否有效
+                $.ajax({
+                    url: 'http://localhost:8080/login/session',
+                    method: 'GET',
+                    headers: { 'X-Session-Id': sessionId },
+                    success: function (response) {
+                        console.log('Logged in user:', response.user);
+                        // console.log('Logged in member_id:', response.user.member_Id);
+                        console.log('Logged in member_id:', response.member_id);
+                    },
+                    error: function () {
+                        // 若 session 無效，重定向至登入頁
+                        window.location.href = 'login.html';
+                    }
+                });
+            }
+
+            // 加載日期（30天內，不包含今天）
+            let today = new Date();
+            let dateSelect = $('#date-select');
+
+            for (let i = 1; i <= 30; i++) {
+                let futureDate = new Date();
+                futureDate.setDate(today.getDate() + i);
+
+                // 格式化日期為 yyyy-mm-dd
+                let year = futureDate.getFullYear();
+                let month = (futureDate.getMonth() + 1).toString().padStart(2, '0'); // 月份 1-12
+                let day = futureDate.getDate().toString().padStart(2, '0'); // 日期 01-31
+
+                let formattedDate = `${year}-${month}-${day}`;
+
+                let option = $('<option>').val(formattedDate).text(formattedDate);
+                dateSelect.append(option);
+            }
+
+
+            $('#submit-booking').click(function () {
+
+                let adultCount = $('#adult-select').val();
+                let childCount = $('#child-select').val();
+                let timeSlot = $('input[name="time-slot"]:checked').val(); // 獲取選中的時段
+
+                // 驗證大人或小孩至少有一個不為0
+                if (adultCount == 0 && childCount == 0) {
+                    alert("請至少選擇一位大人或小孩的用餐人數");
+                    return; // 停止提交
+                }
+
+                // 驗證是否選擇了時段
+                if (!timeSlot) {
+                    alert("請選擇一個用餐時段");
+                    return; // 停止提交
+                }
+
+                // 構建預約數據
+                let bookingData = {
+                    adultCount: $('#adult-select').val(),
+                    childCount: $('#child-select').val(),
+                    date: $('#date-select').val(),
+                    timeSlot: $('input[name="time-slot"]:checked').val(),
+                    requirement: $('#order-requirement').val()
+                };
+                localStorage.setItem('bookingData', JSON.stringify(bookingData));
+
+                // console.log("bookingData--\n" + JSON.stringify(bookingData, null, 2));
+                // alert("讚停一下");
+                window.location.href = 'booking2.html';
+            });
+        });
+    </script>
+
+
+</body>
+
+</html>
