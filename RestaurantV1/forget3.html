@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GJ小吃攤-重新設置密碼</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .spacer {
+            height: 250px;
+            /* 您可以根据需要调整这个高度 */
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- 引入導航欄 -->
+    <div id="navbar"></div>
+
+    <!-- 會員註冊表單 -->
+    <div class="container mt-5">
+        <h2 class="text-center mb-4">重新設置密碼</h2>
+        <h4 class="text-center mb-4">請輸入一組新的登入密碼﹔</h4>
+        <form id="forgetForm">
+            <table class="table">
+                <tbody>
+                    <tr>
+                        <td><label for="password">密碼</label></td>
+                        <td><input type="password" class="form-control" id="password" placeholder="請輸入您的密碼" required>
+                            ※密碼長度須為8-20個字元，至少包含1個數字、1個英文字母與1個特殊符號
+                        </td>
+
+                    </tr>
+                    <tr>
+                        <td><label for="confirmPassword">密碼確認</label></td>
+                        <td><input type="password" class="form-control" id="confirmPassword" placeholder="請再次輸入您的密碼"
+                                required></td>
+                    </tr>
+
+                </tbody>
+            </table>
+            <div class="d-flex justify-content-center mt-4">
+                <button type="submit" class="btn btn-primary me-3">設定新密碼</button>
+                <button type="button" class="btn btn-secondary"
+                    onclick="window.location.href='index2.html'">取消返回</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- 空白區塊 -->
+    <div class="spacer"></div>
+
+    <!-- 引入頁腳 -->
+    <div id="footer"></div>
+
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- jQuery 加載導航欄和頁腳 -->
+    <script>
+        $(function () {
+            $("#navbar").load("nav.html");
+            $("#footer").load("footer.html");
+        });
+    </script>
+
+    <script>
+
+        $(document).ready(function () {
+
+            const urlParams = new URLSearchParams(window.location.search);
+            const account = urlParams.get("account");
+
+            console.log("Received account:", account);  // 檢查帳號是否正確
+
+            $("#forgetForm").on("submit", function (e) {
+                e.preventDefault();
+                const password = $("#password").val();
+                const confirmPassword = $("#confirmPassword").val();
+
+
+                // 驗證密碼是否符合規範
+                var passwordPattern = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,20}$/;
+                if (!passwordPattern.test(password)) {
+                    alert("密碼須為8-20個字元，並包含至少1個字母、1個數字和1個特殊符號。");
+                    return;
+                }
+
+
+                if (password !== confirmPassword) {
+                    alert("兩次輸入的密碼不一致");
+                    return;
+                }
+
+
+                $.ajax({
+                    url: "http://localhost:8080/member/changePassword",
+                    type: "PUT",
+                    contentType: "application/json",
+                    data: JSON.stringify({ loginAccount: account, newPassword: password }),
+                    success: function (response) {
+                        console.log(response);
+                        alert(response);
+                        if (response === "密碼更新成功") {
+                            window.location.href = "login.html";
+                        }
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        console.error("Error occurred: ", textStatus, errorThrown);  // 捕捉錯誤
+                    }
+                });
+            });
+        });
+
+    </script>
+
+
+
+</body>
+
+</html>
