@@ -1,2 +1,3 @@
 # GJ_TrainingTopicFrontEnd
-受訓專題成果
+職訓受訓專題成果
+
