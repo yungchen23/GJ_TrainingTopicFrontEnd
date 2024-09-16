@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>客戶資料編輯</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/main.css">
+    <style>
+        .form-container {
+            max-width: 50%;
+            /* 將表單寬度減少一半 */
+            margin: 0 auto;
+            /* 居中顯示 */
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .btn-group {
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .btn-group button {
+            margin-left: 1rem;
+        }
+
+        #imagePreview {
+            width: 200px;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- session判斷用 -->
+    <div id="hide_session"></div>
+    <!-- 引入導航 -->
+    <div id="navbar"></div>
+
+    <!-- Main Content -->
+    <div class="container mt-4 form-container">
+        <h2>品項資料編輯</h2>
+        <form>
+            <div class="form-group">
+                <label for="itemID">品項編號:</label>
+                <p id="itemID">C00001</p>
+            </div>
+
+            <div class="form-group">
+                <label for="itemName">品項名稱:</label>
+                <input type="text" class="form-control" id="itemName" value="滷肉飯">
+            </div>
+
+            <div class="form-group">
+                <label for="describe">品項描述:</label>
+                <textarea class="form-control" id="describe" value="59"></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="price">價格:</label>
+                <input type="text" class="form-control" id="price" value="60">
+            </div>
+
+            <div class="form-group">
+                <label for="status">狀態:</label>
+                <select class="form-select" id="status">
+                    <!-- <option value="正常" selected>正常</option>
+                    <option value="封鎖">封鎖</option> -->
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>品項圖片來源:</label>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="imageSource" id="urlOptionRadio" value="url"
+                        checked>
+                    <label for="urlOptionRadio" class="form-check-label">
+                        手動輸入網址
+                    </label>
+                    <input type="text" class="form-control " id="itemImageUrl">
+                </div>
+            </div>
+
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="imageSource" id="uploadOption" value="upload">
+                <label class="form-check-label" for="uploadOption">
+                    上傳圖片
+                </label>
+            </div>
+            <div class="form-group" id="uploadContainer">
+                <!-- <label for="itemImage">上傳圖片:</label>
+                <input type="file" class="form-control" id="itemImage"> -->
+
+
+                <!-- <div class="d-flex align-items-center mt-2">
+                    <button type="button" class="btn btn-primary me-2" id="uploadButton">上傳圖片</button>
+                    <button type="button" class="btn btn-secondary" id="clearButton">清除</button>
+                    <span id="fileInfo" class="ms-2"></span>
+                </div>
+                <img id="imagePreview" class="img-preview mt-2" alt="Image Preview" style="display: none;"> -->
+
+                <div class="d-flex align-items-center mt-2">
+                    <input type="file" id="itemImage" style="display: none;">
+                    <button type="button" class="btn btn-primary me-2" id="uploadButton">選擇圖片</button>
+                    <button type="button" class="btn btn-secondary" id="clearButton">清除</button>
+                    <span id="fileInfo" class="ms-2"></span>
+                    <div>
+                        <img id="imagePreview" class="img-preview mt-2" alt="Image Preview" style="display: none;">
+                    </div>
+                </div>
+
+
+            </div>
+
+            <div class="btn-group mt-4">
+                <button type="submit" class="btn btn-primary">儲存編輯</button>
+                <button type="button" class="btn btn-secondary"
+                    onclick="window.location.href='menu_list.html'">取消編輯</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+
+            // 初始狀態設置
+            $("#uploadContainer").hide();
+
+            // 獲取URL中的menuId參數
+            const urlParams = new URLSearchParams(window.location.search);
+            const menuId = urlParams.get('menuId');
+
+            if (menuId) {
+                $.ajax({
+                    url: "http://localhost:8080/api4/item/" + menuId,
+                    type: "GET",
+                    dataType: "json",
+                    success: function (data) {
+                        // 在這裡可以將 data 動態插入到你的頁面
+                        $("#itemID").text(data.menu_id);
+                        $("#itemName").val(data.menu_name);
+                        $("#price").val(data.menu_price);
+                        $("#describe").val(data.menu_describe);
+                        $("#itemImageUrl").val(data.menu_image);
+
+                        let itemStateSelect = $("#status");
+                        itemStateSelect.empty();
+                        itemStateSelect.append(new Option("上架", "上架"));
+                        itemStateSelect.append(new Option("下架", "下架"));
+
+                        let itemstate = data.menu_state === "上架" ? "上架" : "下架";
+                        itemStateSelect.val(itemstate);
+
+                        // 顯示圖片預覽
+                        if (data.menu_image) {
+                            // $("#itemImageUrl").val(data.menu_image);
+                            // $("#imagePreview").attr("src", data.menu_image).show();
+                            // $("#fileInfoContainer").removeClass('d-none');
+                            $("#fileInfo").text("目前圖片: " + data.menu_image);
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        console.error("發生錯誤: " + error);
+                    }
+                });
+
+                // 監聽表單提交事件
+                $('form').on('submit', function (e) {
+                    e.preventDefault();  // 阻止表單的預設提交行為
+
+                    // 收集表單數據
+                    const formData = new FormData(this);
+
+                    // 发送 AJAX 请求
+                    $.ajax({
+                        url: "http://localhost:8080/api4/item/" + menuId,
+                        type: "PUT",  // 使用 PUT 方法更新數據
+                        data: formData,
+                        processData: false,
+                        contentType: false,
+                        success: function (response) {
+                            alert('資料已成功更新');
+                            window.location.href = 'menu_list.html';
+                        },
+                        error: function (xhr, status, error) {
+                            console.error("發生錯誤: " + error);
+                        }
+                    });
+                });
+            } else {
+                console.error("No menuId specified in the URL");
+            }
+
+            // 處理圖片來源選擇
+            $("input[name='imageSource']").on('change', function () {
+                const selectedOption = $("input[name='imageSource']:checked").val();
+                if (selectedOption === 'url') {
+                    $("#itemImageUrl").show();
+                    $("#uploadContainer").hide();
+                } else {
+                    $("#itemImageUrl").hide();
+                    $("#uploadContainer").show();
+                }
+            });
+
+
+            // $("input[name='imageSource']").on('change', function () {
+            //     const selectedOption = $("input[name='imageSource']:checked").val();
+            //     if (selectedOption === 'url') {
+            //         $("#urlContainer").removeClass('d-none');
+            //         $("#uploadContainer").addClass('d-none');
+            //     } else {
+            //         $("#urlContainer").addClass('d-none');
+            //         $("#uploadContainer").removeClass('d-none');
+            //     }
+            // });
+
+            // 處理圖片預覽
+            // $("#uploadButton").on('click', function () {
+            //     const file = $("#itemImage")[0].files[0];
+            //     if (file) {
+            //         const reader = new FileReader();
+            //         reader.onload = function (e) {
+            //             $("#imagePreview").attr("src", e.target.result).show();
+            //             $("#fileInfoContainer").removeClass('d-none');
+            //             $("#fileInfo").text(file.name);
+            //         };
+            //         reader.readAsDataURL(file);
+            //     }
+            // });
+
+
+            // 顯示圖片選擇器
+            $("#uploadButton").on('click', function () {
+                $("#itemImage").click();
+            });
+
+            // 處理檔案選擇和預覽
+            $("#itemImage").on('change', function () {
+                const file = this.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function (e) {
+                        $("#imagePreview").attr("src", e.target.result).show();
+                        $("#fileInfo").text(file.name);
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+
+
+
+
+
+            // 清除檔案
+            $("#clearButton").on('click', function () {
+                $("#itemImage").val('');
+                $("#imagePreview").hide();
+                $("#fileInfo").text('');
+                $("#fileInfoContainer").addClass('d-none');
+            });
+        });
+    </script>
+
+
+
+
+
+
+
+    <!-- <script>
+        $(document).ready(function () {
+
+            // 獲取URL中的loginAccount參數
+            const urlParams = new URLSearchParams(window.location.search);
+            const menuId = urlParams.get('menuId');
+
+
+            if (menuId) {
+                $.ajax({
+                    url: "http://localhost:8080/api4/item/" + menuId,
+                    type: "GET",
+                    dataType: "json",
+                    success: function (data) {
+                        // 在這裡可以將 data 動態插入到你的頁面
+                        $("#itemID").text(data.menu_id);
+                        $("#itemName").text(data.menu_name);
+                        $("#price").val(data.menu_price);
+                        $("#describe").val(data.menu_describe);
+
+
+                        let itemStateSelect = $("#status");
+                        itemStateSelect.empty();
+
+                        itemStateSelect.append(new Option("上架", "上架"));
+                        itemStateSelect.append(new Option("下架", "下架"));
+
+                        // let employeeStateSelect = $("#status");
+
+                        let itemstate = data.loginformember.member_state ? "上架" : "下架";
+                        itemStateSelect.val(itemstate);
+
+                        // 顯示圖片預覽
+                        if (data.menu_image) {
+                            $("#imagePreview").attr("src", data.menu_image).show();
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        console.error("發生錯誤: " + error);
+                    }
+                });
+
+                // 監聽表單提交事件
+                $('form').on('submit', function (e) {
+                    e.preventDefault();  // 阻止表單的預設提交行為
+
+                    // 收集表單數據
+                    const formData = new FormData(this);
+                    // const memberData = {
+                    //     member_id: $("#itemID").text(),
+                    //     member_name: $("#itemName").val(),
+                    //     member_sex: $("#price").val(),
+                    //     member_phone: $("#describe").val(),
+                    //     member_birth: $("#birthday").val(),
+                    //     member_mail: $("#email").val(),
+                    //     member_address: $("#city").val(),
+                    //     loginformember: {
+                    //         login_id: $("#customerID").text(),
+                    //         login_account: $("#account").text(),
+                    //         member_state: $("#status").val() === "正常"
+                    //     }
+                    // };
+
+
+                    // 发送 AJAX 请求
+                    $.ajax({
+                        url: "http://localhost:8080/api4/item/" + menuId,
+                        type: "PUT",  // 使用 PUT 方法更新數據
+                        data: formData,
+                        processData: false,
+                        contentType: false,
+                        success: function (response) {
+                            alert('資料已成功更新');
+                            window.location.href = 'mealsettings.html';
+                        },
+                        error: function (xhr, status, error) {
+                            console.error("發生錯誤: " + error);
+                        }
+                    });
+                });
+            } else {
+                console.error("No menuId  specified in the URL");
+            }
+            // 處理圖片預覽
+            $("#itemImage").on('change', function () {
+                const file = this.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function (e) {
+                        $("#imagePreview").attr("src", e.target.result).show();
+                    };
+                    reader.readAsDataURL(file);
+                } else {
+                    $("#imagePreview").hide();
+                }
+            });
+        });
+
+    </script> -->
+
+
+    <!-- Bootstrap JS (optional) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+
+
+    <!-- 空白區塊 -->
+    <div class="spacer"></div>
+
+    <!-- 引入頁腳 -->
+    <div id="footer"></div>
+
+    <!-- jQuery 加載導航欄和頁腳 -->
+    <script>
+        $(function () {
+            $("#navbar").load("nav2.html");
+            $("#footer").load("footer.html");
+            $("#hide_session").load("session.html");
+        });
+    </script>
+</body>
+
+</html>

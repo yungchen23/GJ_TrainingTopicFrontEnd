@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>餐廳管理系統</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/main.css">
+
+</head>
+<body>
+    <!-- session判斷用 -->
+    <div id="hide_session"></div>
+    
+        <!-- 引入導航 -->
+        <div id="navbar"></div>
+
+
+    <!-- Main Content -->
+    <div class="container mt-4">
+        <h2>客戶列表</h2>
+        <!-- Filter Section -->
+        <div class="mb-3">
+            <select class="form-select d-inline-block w-auto">
+                <option value="customerID">客戶編號</option>
+                <option value="account">帳號</option>
+                <option value="customerName">姓名</option>
+            </select>
+            <input type="text" class="form-control d-inline-block w-auto" placeholder="輸入關鍵字">
+            <button class="btn btn-primary">查詢</button>
+        </div>
+
+        <!-- Table -->
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th scope="col">客戶編號</th>
+                    <th scope="col">帳號</th>
+                    <th scope="col">姓名</th>
+                    <th scope="col">稱謂</th>
+                    <th scope="col">生日</th>
+                    <th scope="col">聯繫電話</th>
+                    <th scope="col">電子信箱</th>
+                    <th scope="col">居住縣市</th>
+                    <th scope="col">客戶狀態</th>
+                    <th scope="col">動作</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- <tr>
+                    <td id="customer1"></td>
+                    <td>wang@example.com</td>
+                    <td>王大明</td>
+                    <td>先生</td>
+                    <td>1985-03-21</td>
+                    <td>0912345678</td>
+                    <td>wang@example.com</td>
+                    <td>台北市</td>
+                    <td>正常</td>
+                    <td class="table-actions">
+                        <button class="btn btn-info">查看客戶</button>
+                        <button class="btn btn-warning">編輯客戶</button>
+                    </td>
+                </tr>
+               
+                <tr>
+                    <td id="customer15"></td>
+                    <td>chungxq@example.com</td>
+                    <td>鍾小琴</td>
+                    <td>小姐</td>
+                    <td>1990-12-25</td>
+                    <td>0910987654</td>
+                    <td>chungxq@example.com</td>
+                    <td>南投縣</td>
+                    <td>正常</td>
+                    <td class="table-actions">
+                        <button class="btn btn-info">查看客戶</button>
+                        <button class="btn btn-warning">編輯客戶</button>
+                    </td>
+                </tr> -->
+            </tbody>
+        </table>
+
+        <!-- Pagination -->
+        <nav>
+            <ul class="pagination">
+                <li class="page-item"><a class="page-link" href="#">上一頁</a></li>
+                <li class="page-item"><a class="page-link" href="#">1</a></li>
+                <li class="page-item"><a class="page-link" href="#">2</a></li>
+                <li class="page-item"><a class="page-link" href="#">3</a></li>
+                <li class="page-item"><a class="page-link" href="#">下一頁</a></li>
+            </ul>
+        </nav>
+    </div>
+
+    <!-- Bootstrap JS (optional) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <script>
+
+        $(document).ready(function () {
+
+            // 使用 $.ajax 方法获取JSON数据
+            $.ajax({
+                url: 'http://localhost:8080/api2/members',
+                method: 'GET',
+                dataType: 'json',
+                success: function (data) {
+                    // 調用方法顯示會員數據
+                    displayMemberData(data);
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    console.error('Error fetching data:', textStatus, errorThrown);
+                }
+            });
+      
+
+            // 顯示會員數具
+            function displayMemberData(members) {
+                var tableBody = $('table tbody');
+                tableBody.empty(); // 清空表格内容
+
+                $.each(members, function (index, member) {
+                    var row = $('<tr></tr>');
+
+                    row.append('<td>' + member.member_id + '</td>');
+                    row.append('<td>' + member.loginformember.login_account + '</td>');
+                    row.append('<td>' + member.member_name + '</td>');
+                    row.append('<td>' + member.member_sex + '</td>');
+                    row.append('<td>' + member.member_birth + '</td>');
+                    row.append('<td>' + member.member_phone + '</td>');
+                    row.append('<td>' + member.member_mail + '</td>');
+                    row.append('<td>' + member.member_address + '</td>');
+
+                    var memberState = member.loginformember.member_state ? "正常" : "停用";
+                    row.append('<td>' + memberState + '</td>');
+
+
+                    //編輯按鈕
+                    var editbutton = $('<button class="btn btn-warning">編輯客戶</button>');
+                    editbutton.on('click', function () {
+                        var loginAccount = member.loginformember.login_account;
+                        console.log(loginAccount);
+                        window.location.href = 'member_edit.html?loginAccount=' + loginAccount;
+                    });
+
+                    //查看資料
+                    var viewbutton = $('<button class="btn btn-info">查看</button>');
+                    viewbutton.on('click', function () {
+                        var loginAccount = member.loginformember.login_account;
+                        console.log(loginAccount);
+                        window.location.href = 'member_detail.html?loginAccount=' + loginAccount;
+                    });
+
+                    var actions = $('<td class="table-actions"></td>');
+                    // actions.append('<button class="btn btn-info">查看</button>');
+                    actions.append(viewbutton);
+                    actions.append(editbutton);
+
+                    row.append(actions);
+
+                    // row.append(`
+                    //     <td class="table-actions">
+                    //         <button class="btn btn-info">查看</button>
+                    //         <button class="btn btn-warning">編輯</button>
+                    //     </td>
+                    // `);
+                    tableBody.append(row);
+                });
+            }
+        });
+    </script>
+
+    
+    <!-- <script>
+        function generateCustomerNumber(index) {
+            return `A${String(index).padStart(5, '0')}`;
+        }
+
+        for (let i = 1; i <= 15; i++) {
+            document.getElementById(`customer${i}`).innerText = generateCustomerNumber(i);
+        }
+    </script> -->
+
+   
+    <!-- Bootstrap JS (optional) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <!-- session判斷用 -->
+    <div id="hide_session"></div>
+
+    <!-- 空白區塊 -->
+    <div class="spacer"></div>
+
+    <!-- 引入頁腳 -->
+    <div id="footer"></div>
+
+    <!-- jQuery 加載導航欄和頁腳 -->
+    <script>
+        $(function () {
+            $("#navbar").load("nav2.html");
+            $("#footer").load("footer.html");
+            $("#hide_session").load("session.html");
+        });
+    </script>
+</body>
+</html>

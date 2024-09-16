@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>餐廳管理系統</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/main.css">
+</head>
+
+<body>
+    <!-- session判斷用 -->
+    <div id="hide_session"></div>
+
+    <!-- 引入導航 -->
+    <div id="navbar"></div>
+
+    <!-- Main Content -->
+    <div class="container mt-4">
+        <h2>預約列表</h2>
+        <!-- Filter Section -->
+        <div class="mb-3">
+            <select class="form-select d-inline-block w-auto">
+                <option value="orderNumber">訂單編號</option>
+                <option value="customerName">訂位人</option>
+                <option value="contactNumber">連絡電話</option>
+            </select>
+            <input type="text" class="form-control d-inline-block w-auto" placeholder="輸入關鍵字">
+            <button class="btn btn-primary">查詢</button>
+        </div>
+
+        <!-- Table -->
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th scope="col">訂單編號</th>
+                    <th scope="col">訂位人</th>
+                    <th scope="col">稱謂</th>
+                    <th scope="col">連絡電話</th>
+                    <th scope="col">日期</th>
+                    <th scope="col">時間</th>
+                    <th scope="col">訂位人數(大人)</th>
+                    <th scope="col">訂位人數(小孩)</th>
+                    <th scope="col">訂位需求</th>
+                    <th scope="col">訂單狀態</th>
+                    <th scope="col">動作</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- 表格內容將通過JavaScript動態生成 -->
+            </tbody>
+        </table>
+
+        <!-- Pagination -->
+        <nav>
+            <ul class="pagination">
+                <li class="page-item"><a class="page-link" href="#">上一頁</a></li>
+                <li class="page-item"><a class="page-link" href="#">1</a></li>
+                <li class="page-item"><a class="page-link" href="#">2</a></li>
+                <li class="page-item"><a class="page-link" href="#">3</a></li>
+                <li class="page-item"><a class="page-link" href="#">下一頁</a></li>
+            </ul>
+        </nav>
+    </div>
+
+    <!-- Modal for Confirmation -->
+    <div class="modal fade" id="confirmationModal" tabindex="-1" aria-labelledby="confirmationModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="confirmationModalLabel">確認操作</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p id="confirmationMessage"></p>
+                    <p><strong>預約日期：</strong><span id="modalBookingDate"></span></p>
+                    <p><strong>時段：</strong><span id="modalBookingTime"></span></p>
+                    <p><strong>訂位人姓名：</strong><span id="modalBookingName"></span></p>
+                    <p><strong>聯繫電話：</strong><span id="modalBookingPhone"></span></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">關閉</button>
+                    <button type="button" class="btn btn-primary" id="confirmAction">確認</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+
+    <script>
+        $(document).ready(function () {
+            // 使用 $.ajax 方法获取JSON数据
+            $.ajax({
+                url: 'http://localhost:8080/api3/bookings',
+                method: 'GET',
+                dataType: 'json',
+                success: function (data) {
+                    // 調用方法顯示預約數據
+                    displayBookingData(data);
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    console.error('Error fetching data:', textStatus, errorThrown);
+                }
+            });
+
+            // 显示預約数据的函数
+            function displayBookingData(bookings) {
+                var tableBody = $('table tbody');
+                tableBody.empty(); // 清空表格内容
+
+                $.each(bookings, function (index, booking) {
+                    var row = $('<tr></tr>');
+
+                    row.append('<td>' + booking.booking_id + '</td>');
+                    row.append('<td>' + booking.booking_name + '</td>');
+                    row.append('<td>' + booking.booking_sex + '</td>');
+                    row.append('<td>' + booking.booking_phone + '</td>');
+                    row.append('<td>' + booking.booking_date + '</td>');
+                    row.append('<td>' + booking.booking_time + '</td>');
+                    row.append('<td>' + booking.booking_adult + '</td>');
+                    row.append('<td>' + booking.booking_kids + '</td>');
+                    row.append('<td>' + booking.booking_remark + '</td>');
+
+                    // 根據 booking_states 顯示不同狀態
+                    var bookingStatus = '';
+                    if (booking.booking_states === "1") {
+                        bookingStatus = '未報到';
+                    } else if (booking.booking_states === "2") {
+                        bookingStatus = '已報到';
+                    } else if (booking.booking_states === "3") {
+                        bookingStatus = '已取消';
+                    }
+                    row.append('<td>' + bookingStatus + '</td>');
+
+                    // 動作內容
+                    var actions = $('<td class="table-actions"></td>');
+                    if (booking.booking_states === "1") {
+                        // 顯示按鈕
+                        var checkinButton = $('<button class="btn btn-success">客人報到</button>');
+                        var cancelButton = $('<button class="btn btn-danger">客人取消</button>');
+
+                        // 點擊 "客人報到" 顯示 modal
+                        checkinButton.on('click', function () {
+                            showConfirmationModal(booking, "2", "確認客人報到");
+                        });
+
+                        // 點擊 "客人取消" 顯示 modal
+                        cancelButton.on('click', function () {
+                            showConfirmationModal(booking, "3", "確認客人取消");
+                        });
+
+                        actions.append(checkinButton);
+                        actions.append(cancelButton);
+                    } else if (booking.booking_states === "2") {
+                        actions.append('<span>已報到</span>');
+                    } else if (booking.booking_states === "3") {
+                        actions.append('<span>已取消</span>');
+                    }
+
+                    row.append(actions);
+                    tableBody.append(row);
+                });
+            }
+
+            // 顯示確認 modal 並設置相應數據
+            function showConfirmationModal(booking, newStatus, action) {
+                $('#confirmationMessage').text(action + "：確定要" + action + "嗎？");
+                $('#modalBookingDate').text(booking.booking_date);
+                $('#modalBookingTime').text(booking.booking_time);
+                $('#modalBookingName').text(booking.booking_name);
+                $('#modalBookingPhone').text(booking.booking_phone);
+
+                //有問題(找不到解法)
+                // $('#confirmationModal').modal('show');
+
+                // 找到 modal 元素
+                var confirmationModal = new bootstrap.Modal(document.getElementById('confirmationModal'));
+
+                // 顯示 modal
+                confirmationModal.show();
+
+
+                // 當點擊確認按鈕時，調用更新狀態的函數
+                $('#confirmAction').off('click').on('click', function () {
+                    updateBookingStatus(booking.booking_id, newStatus);
+                    $('#confirmationModal').modal('hide'); // 關閉 modal
+                });
+            }
+
+            // 更新預約狀態
+            function updateBookingStatus(bookingId, newStatus) {
+                $.ajax({
+                    url: 'http://localhost:8080/api3/bookings/' + bookingId, // 確保URL正確
+                    method: 'PUT',
+                    contentType: 'application/json',
+                    data: JSON.stringify({ booking_states: newStatus }), // 傳遞更新的狀態
+                    success: function (response) {
+                        alert("狀態更新成功！");
+                        location.reload(); // 成功後刷新頁面以顯示更新後的狀態
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        console.error('更新狀態時發生錯誤:', textStatus, errorThrown);
+                        alert("狀態更新失敗，請重試！");
+                    }
+                });
+            }
+
+        });
+    </script>
+
+    <!-- 空白區塊 -->
+    <div class="spacer"></div>
+
+    <!-- 引入頁腳 -->
+    <div id="footer"></div>
+
+    <!-- jQuery 加載導航欄和頁腳 -->
+    <script>
+        $(function () {
+            $("#navbar").load("nav2.html");
+            $("#footer").load("footer.html");
+            $("#hide_session").load("session.html");
+        });
+    </script>
+
+</body>
+
+</html>

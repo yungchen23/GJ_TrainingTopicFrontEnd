@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>員工資料編輯</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/main.css">
+    <style>
+
+        .form-container {
+            max-width: 50%;
+            /* 將表單寬度減少一半 */
+            margin: 0 auto;
+            /* 居中顯示 */
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .btn-group {
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .btn-group button {
+            margin-left: 1rem;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- session判斷用 -->
+    <div id="hide_session"></div>
+    <!-- 引入導航 -->
+    <div id="navbar"></div>
+
+    <!-- Main Content -->
+    <div class="container mt-4 form-container">
+        <h2>員工資料編輯</h2>
+        <form>
+            <div class="form-group">
+                <label for="employeeID">員工編號:</label>
+                <p id="employeeID"></p>
+            </div>
+            <div class="form-group">
+                <label for="account">帳號:</label>
+                <p id="account"></p>
+            </div>
+            <div class="form-group">
+                <label for="startDate">到職時間:</label>
+                <p id="startDate"></p>
+            </div>
+            <div class="form-group">
+                <label for="name">姓名:</label>
+                <input type="text" class="form-control" id="name">
+            </div>
+            <div class="form-group">
+                <label for="position">位階:</label>
+                <select class="form-select" id="position">
+                    <!-- <option value="負責人">負責人</option>
+                    <option value="經理" selected>經理</option>
+                    <option value="主管">主管</option>
+                    <option value="員工">員工</option> -->
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="birthday">生日:</label>
+                <input type="text" class="form-control" id="birthday">
+            </div>
+            <div class="form-group">
+                <label for="phone">聯繫電話:</label>
+                <input type="text" class="form-control" id="phone">
+            </div>
+            <div class="form-group">
+                <label for="email">電子信箱:</label>
+                <input type="text" class="form-control" id="email">
+            </div>
+            <div class="form-group">
+                <label for="status">員工狀態:</label>
+                <select class="form-select" id="status">
+                    <!-- <option value="正常" selected>正常</option>
+                    <option value="停用">停用</option> -->
+                </select>
+            </div>
+            <div class="btn-group mt-4">
+                <button type="submit" class="btn btn-primary">儲存編輯</button>
+                <button type="button" class="btn btn-secondary"
+                    onclick="window.location.href='employee_list.html'">取消編輯</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Bootstrap JS (optional) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+
+            // 獲取URL中的loginAccount參數
+            const urlParams = new URLSearchParams(window.location.search);
+            const loginAccount = urlParams.get('loginAccount');
+
+
+            if (loginAccount) {
+                $.ajax({
+                    url: "http://localhost:8080/api/employee/" + loginAccount,
+                    type: "GET",
+                    dataType: "json",
+                    success: function (data) {
+                        // 在這裡可以將 data 動態插入到你的頁面
+                        $("#employeeID").text(data.employee_id);
+                        $("#account").text(data.loginForEmployee.login_account);
+                        $("#startDate").text(data.employee_jointime);
+                        $("#name").val(data.employee_name);
+                        $("#birthday").val(data.employee_birth);
+                        $("#phone").val(data.employee_phone);
+                        $("#email").val(data.employee_mail);
+
+                        let positionSelect = $("#position");
+                        positionSelect.empty();  //清空選項
+
+                        //設定預設顯示
+                        positionSelect.append(new Option("負責人", "負責人"));
+                        positionSelect.append(new Option("經理", "經理"));
+                        positionSelect.append(new Option("主管", "主管"));
+                        positionSelect.append(new Option("職員", "職員"));
+                        positionSelect.val(data.employee_position);
+
+
+                        let employeeStateSelect = $("#status");
+                        employeeStateSelect.empty();
+
+                        employeeStateSelect.append(new Option("正常", "正常"));
+                        employeeStateSelect.append(new Option("停用", "停用"));
+
+                        // let employeeStateSelect = $("#status");
+
+                        let empstate = data.loginForEmployee.employee_state ? "正常" : "停用";
+                        employeeStateSelect.val(empstate);
+
+                    },
+                    error: function (xhr, status, error) {
+                        console.error("發生錯誤: " + error);
+                    }
+                });
+
+                // 監聽表單提交事件
+                $('form').on('submit', function (e) {
+                    e.preventDefault();  // 阻止表單的預設提交行為
+
+                    // 收集表單數據
+                    const employeeData = {
+                        employee_id: $("#employeeID").text(),
+                        employee_name: $("#name").val(),
+                        employee_position: $("#position").val(),
+                        employee_jointime: $("#startDate").text(),
+                        employee_phone: $("#phone").val(),
+                        employee_birth: $("#birthday").val(),
+                        employee_mail: $("#email").val(),
+                        loginForEmployee: {
+                            login_account: $("#account").text(),
+                            employee_state: $("#status").val() === "正常"
+                        }
+                    };
+
+                    // 发送 AJAX 请求
+                    $.ajax({
+                        url: "http://localhost:8080/api/employee/" + loginAccount,
+                        type: "PUT",  // 使用 PUT 方法更新數據
+                        contentType: "application/json",
+                        data: JSON.stringify(employeeData),
+                        success: function (response) {
+                            alert('資料已成功更新');
+                            window.location.href = 'employee_list.html';
+                        },
+                        error: function (xhr, status, error) {
+                            console.error("發生錯誤: " + error);
+                        }
+                    });
+                });
+            } else {
+                console.error("No loginAccount specified in the URL");
+            }
+        });
+
+    </script>
+  
+  
+    <!-- Bootstrap JS (optional) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+
+
+    <!-- 空白區塊 -->
+    <div class="spacer"></div>
+
+    <!-- 引入頁腳 -->
+    <div id="footer"></div>
+
+    <!-- jQuery 加載導航欄和頁腳 -->
+    <script>
+        $(function () {
+            $("#navbar").load("nav2.html");
+            $("#footer").load("footer.html");
+            $("#hide_session").load("session.html");
+        });
+    </script>
+
+
+
+</body>
+
+</html>
