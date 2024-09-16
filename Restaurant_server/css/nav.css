@@ -1,0 +1,167 @@
+.navbar {
+    background-color: black;
+    height: 120px;
+}
+
+.navbar-nav li a {
+    font-size: 20px;
+    color: white;
+    transition: color 0.3s ease;
+}
+
+.navbar-nav li a:hover {
+    color: yellow;
+    background-color: black;
+}
+
+/* .navbar-nav .nav-item{
+    font-size: 20px;
+    color: white;
+    transition: color 0.3s ease; 
+}
+
+.nav-item :hover{
+    color: rgb(20, 186, 247);
+} */
+
+
+.navbar-brand {
+    font-size: 24px;
+    color: white;
+}
+
+/* .navbar-nav .dropdown-menu {
+    background-color: rgb(0, 0, 0);
+    border: 1px solid white;
+} */
+
+.navbar-nav .dropdown-menu a {
+    color: rgb(18, 15, 15);
+}
+
+.navbar-nav .dropdown-menu a:hover {
+    color: rgb(254, 254, 254);
+}
+
+
+
+.table-actions button {
+    margin-right: 5px;
+}
+
+.login-btn {
+    color: white;
+    background-color: chocolate;
+    border-radius: 20px;
+    padding: 5px 15px;
+    margin-left: 5px;
+}
+
+.login-btn:hover {
+    background-color: chocolate;
+    color: black;
+}
+
+.register-btn {
+    color: white;
+    background-color: rgb(0, 0, 0);
+    border-radius: 20px;
+    padding: 5px 15px;
+    margin-left: 5px;
+}
+
+.register-btn:hover {
+    background-color: rgb(0, 0, 0);
+    color: white;
+}
+
+/* .logout-btn {
+    color: white;
+    background-color: chocolate;
+    border-radius: 20px;
+    padding: 5px 15px;
+    margin-left: 5px;
+} */
+
+/* .logout-btn:hover {
+    background-color: chocolate;
+    color: black;
+} */
+
+.logout-btn {
+    color: rgb(255, 255, 255);
+
+    background-color: red;
+    border-radius: 20px;
+    padding: 5px 15px;
+    width: 90%;
+}
+
+.logout-btn:hover {
+    background-color: darkred;
+}
+
+.carousel {
+    margin-top: 0px;
+    height: 300px;
+    /* 10:3 ratio for 1000px width */
+}
+
+.carousel img {
+    height: 100%;
+    width: 100%;
+    object-fit: cover;
+}
+
+.separator {
+    margin-top: 50px;
+    margin-bottom: 10px;
+    text-align: center;
+}
+
+.thumbnail-section {
+    margin-top: 250px;
+    display: flex;
+    justify-content: space-around;
+    text-align: center;
+}
+
+.footer {
+    background-color: black;
+    color: white;
+    text-align: center;
+    padding: 20px 0;
+    margin-top: 30px;
+    height: 250px;
+}
+
+.footer .logo {
+    margin-bottom: 10px;
+}
+
+.logo img {
+    width: 100px;
+    height: 100px;
+}
+
+.dropdown-menu {
+    background-color: rgb(255, 255, 255);
+    border: 1px solid white;
+}
+
+.dropdown-menu a {
+    color: rgb(18, 15, 15);
+}
+
+.dropdown-menu a:hover {
+    color: rgb(0, 0, 0);
+}
+
+
+/* .dropdown-menu a {
+            color: black;
+            padding: 10px 20px;
+            text-decoration: none;
+            display: block;
+            transition: background-color 0.3s ease;
+ } */
